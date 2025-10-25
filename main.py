@@ -71,9 +71,9 @@ def get_zone_penalty(lat, lon):
     for z in zones:
         if z["geometry"].intersects(point):
             if z["zone"] == "red":
-                penalty = max(penalty, 1.7)
+                penalty = max(penalty, 1.9)
             elif z["zone"] == "yellow":
-                penalty = max(penalty, 1.7)
+                penalty = max(penalty, 1.9)
     return penalty
 
 # ✅ Cost functions
