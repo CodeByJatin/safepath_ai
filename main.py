@@ -73,7 +73,7 @@ def get_zone_penalty(lat, lon):
             if z["zone"] == "red":
                 penalty = max(penalty, 1.7)
             elif z["zone"] == "yellow":
-                penalty = max(penalty, 1.3)
+                penalty = max(penalty, 1.7)
     return penalty
 
 # ✅ Cost functions
