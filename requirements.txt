@@ -4,14 +4,10 @@ requests
 networkx
 osmnx
 shapely
-geopandas
-matplotlib
 pandas
 numpy
-fiona
-pyproj
-rtree
-pickle-mixin
-gunicorn
 python-dotenv
+gunicorn
+pickle-mixin
+
 
