@@ -8,6 +8,5 @@ pandas
 numpy
 python-dotenv
 gunicorn
-pickle-mixin
 
 
