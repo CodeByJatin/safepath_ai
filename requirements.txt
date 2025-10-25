@@ -13,3 +13,4 @@ pyproj
 rtree
 pickle-mixin
 gunicorn
+dotenv
