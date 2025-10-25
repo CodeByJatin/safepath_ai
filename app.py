@@ -9,6 +9,7 @@ from shapely.ops import unary_union
 import pickle  
 from dotenv import load_dotenv
 import os
+import gzip
 app = Flask(__name__)
 CORS(app)
 
@@ -21,26 +22,28 @@ TOMTOM_API_KEY = os.getenv("API_KEY")
 def index():
     return send_from_directory("static", "map.html")
 
+#Load Graph
 
-# ✅ Load graph (optimized with pickle)
 print("Loading road network for Delhi…")
+
 try:
-    # Try loading preprocessed pickle file (FAST!)
-    with open("delhi_graph.pkl", "rb") as f:
+    # ✅ Try loading compressed pickle file
+    with gzip.open("delhi_graph.pkl.gz", "rb") as f:
         G = pickle.load(f)
-    print("Graph loaded from pickle in <2 seconds ✅")
+    print("Graph loaded from compressed pickle (.gz) ✅")
 except FileNotFoundError:
-    # First time: load from GraphML and create pickle file
-    print("Pickle file not found. Loading from GraphML (this will take a minute)…")
+    # ⚙️ If file missing, build from GraphML and save compressed
+    print("Compressed pickle not found. Loading from GraphML (this will take a while)…")
     G = ox.load_graphml("delhi.graphml")
     G = ox.add_edge_speeds(G)
     G = ox.add_edge_travel_times(G)
-    
-    # Save as pickle for future fast loading
-    print("Saving graph as pickle file for faster future loading…")
-    with open("delhi_graph.pkl", "wb") as f:
-        pickle.dump(G, f)
-    print("Graph saved as delhi_graph.pkl and loaded ✅")
+
+    # ✅ Save as compressed pickle for future use
+    with gzip.open("delhi_graph.pkl.gz", "wb") as f:
+        pickle.dump(G, f, protocol=pickle.HIGHEST_PROTOCOL)
+
+    print("Graph saved as delhi_graph.pkl.gz and loaded ✅")
+
 
 
 
