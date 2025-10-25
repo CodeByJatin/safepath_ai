@@ -1,0 +1,15 @@
+Flask==3.0.3
+flask-cors
+requests
+networkx
+osmnx
+shapely
+geopandas
+matplotlib
+pandas
+numpy
+fiona
+pyproj
+rtree
+pickle-mixin
+gunicorn

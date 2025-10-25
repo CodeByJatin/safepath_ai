@@ -1,0 +1,142 @@
+[
+    {
+        "lat": 28.54939999999999,
+        "lon": 77.25099999999999,
+        "zone": "yellow",
+        "total_incidents": 91,
+        "radius": 200
+    },
+    {
+        "lat": 28.5921,
+        "lon": 77.04600000000002,
+        "zone": "red",
+        "total_incidents": 107,
+        "radius": 200
+    },
+    {
+        "lat": 28.636700000000005,
+        "lon": 77.29560000000002,
+        "zone": "yellow",
+        "total_incidents": 91,
+        "radius": 200
+    },
+    {
+        "lat": 28.526699999999995,
+        "lon": 77.15589999999997,
+        "zone": "red",
+        "total_incidents": 101,
+        "radius": 200
+    },
+    {
+        "lat": 28.65169999999999,
+        "lon": 77.17839999999998,
+        "zone": "yellow",
+        "total_incidents": 87,
+        "radius": 200
+    },
+    {
+        "lat": 28.6216,
+        "lon": 77.0902,
+        "zone": "yellow",
+        "total_incidents": 96,
+        "radius": 200
+    },
+    {
+        "lat": 28.6315,
+        "lon": 77.21669999999999,
+        "zone": "yellow",
+        "total_incidents": 93,
+        "radius": 200
+    },
+    {
+        "lat": 28.524499999999993,
+        "lon": 77.2066,
+        "zone": "yellow",
+        "total_incidents": 97,
+        "radius": 200
+    },
+    {
+        "lat": 28.708999999999993,
+        "lon": 77.1896,
+        "zone": "red",
+        "total_incidents": 109,
+        "radius": 200
+    },
+    {
+        "lat": 28.536,
+        "lon": 77.26189999999998,
+        "zone": "yellow",
+        "total_incidents": 80,
+        "radius": 200
+    },
+    {
+        "lat": 28.74989999999999,
+        "lon": 77.0565,
+        "zone": "yellow",
+        "total_incidents": 94,
+        "radius": 200
+    },
+    {
+        "lat": 28.548699999999997,
+        "lon": 77.24190000000002,
+        "zone": "red",
+        "total_incidents": 114,
+        "radius": 200
+    },
+    {
+        "lat": 28.651599999999995,
+        "lon": 77.19039999999997,
+        "zone": "red",
+        "total_incidents": 117,
+        "radius": 200
+    },
+    {
+        "lat": 28.56869999999999,
+        "lon": 77.243,
+        "zone": "red",
+        "total_incidents": 101,
+        "radius": 200
+    },
+    {
+        "lat": 28.63530000000001,
+        "lon": 77.08729999999998,
+        "zone": "red",
+        "total_incidents": 115,
+        "radius": 200
+    },
+    {
+        "lat": 28.6848,
+        "lon": 77.27750000000002,
+        "zone": "red",
+        "total_incidents": 105,
+        "radius": 200
+    },
+    {
+        "lat": 28.536900000000003,
+        "lon": 77.20999999999995,
+        "zone": "red",
+        "total_incidents": 119,
+        "radius": 200
+    },
+    {
+        "lat": 28.641099999999998,
+        "lon": 77.12350000000002,
+        "zone": "yellow",
+        "total_incidents": 88,
+        "radius": 200
+    },
+    {
+        "lat": 28.524299999999997,
+        "lon": 77.27729999999997,
+        "zone": "yellow",
+        "total_incidents": 99,
+        "radius": 200
+    },
+    {
+        "lat": 28.677000000000003,
+        "lon": 77.289,
+        "zone": "yellow",
+        "total_incidents": 96,
+        "radius": 200
+    }
+]
