@@ -8,5 +8,5 @@ pandas
 numpy
 python-dotenv
 gunicorn
-
+scikit-learn
 
