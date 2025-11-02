@@ -65,12 +65,34 @@
       border: 2px solid rgba(255,255,255,0.9);
     }
 
-    /* ✅ REPORT BUTTON */
+    .live-info-box {
+      position: absolute;
+      right: 18px;
+      bottom: 86px;
+      z-index: 1200;
+      width: 220px;
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      font-size: 13px;
+      display: none;
+      color: #111;
+    }
+    .live-info-title { font-weight: 700; display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px; }
+    .live-info-coords { font-family: monospace; font-size: 13px; margin-bottom: 8px; }
+    .live-info-actions { display:flex; gap:8px; }
+    .live-info-actions button { flex:1; padding:6px 8px; border-radius:6px; border: none; cursor: pointer; font-weight:600; }
+    .btn-copy { background:#007bff; color:white; }
+    .btn-setstart { background:#28a745; color:white; }
+    .btn-close { background:transparent; border:none; font-size:16px; cursor:pointer; color:#666; }
+
+    /* ===== REPORT FEATURE (NEW) ===== */
     .report-btn {
       position: absolute;
       right: 18px;
       top: 20px;
-      z-index: 1200;
+      z-index: 1300;
       padding: 10px 14px;
       background: #007bff;
       color: #fff;
@@ -81,7 +103,6 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
 
-    /* ✅ REPORT BOX */
     .report-box {
       position: absolute;
       right: 18px;
@@ -90,14 +111,15 @@
       background: white;
       border-radius: 12px;
       padding: 14px;
-      z-index: 1300;
+      z-index: 1400;
       display: none;
       font-size: 14px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
 
     .report-box select,
-    .report-box textarea {
+    .report-box textarea,
+    .report-box input[type="text"] {
       width: 100%;
       padding: 6px;
       border-radius: 6px;
@@ -105,6 +127,19 @@
       margin-bottom: 6px;
       outline: none;
     }
+
+    .report-inline-btn {
+      width: 100%;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: none;
+      background: #17a2b8;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+    .report-inline-btn.active { background: #138496; }
 
     .report-submit-btn {
       width: 100%;
@@ -126,29 +161,34 @@
     }
   </style>
 </head>
-
 <body>
   <div id="map"></div>
 
-  <!-- ✅ NEW REPORT UI -->
+  <!-- ========== REPORT UI (NEW) ========== -->
   <button id="reportBtn" class="report-btn">Report</button>
   <div id="reportBox" class="report-box">
-    <label>Crime Type:</label>
+    <label>Type of Crime:</label>
     <select id="crimeType">
       <option>Theft</option>
       <option>Harassment</option>
-      <option>Assault</option>
       <option>Vandalism</option>
+      <option>Assault</option>
       <option>Suspicious Activity</option>
       <option>Other</option>
     </select>
-    <label>Details:</label>
-    <textarea id="crimeDetails" rows="3" placeholder="Describe your report..."></textarea>
-    <button id="submitReport" class="report-submit-btn">Submit</button>
-    <div id="thankYou" class="thanks-msg">Thank you, your report is submitted!</div>
-  </div>
 
-  <!-- ✅ ALL PREVIOUS UI BELOW (Safe Mode, Routing, etc.) -->
+    <!-- A) Choose Location button below dropdown -->
+    <button id="chooseReportLoc" class="report-inline-btn">Choose Location on Map</button>
+    <input id="reportCoords" type="text" placeholder="Lat, Lon (auto-filled)" readonly />
+
+    <label>Details:</label>
+    <textarea id="crimeDetails" rows="3" placeholder="Describe what happened"></textarea>
+
+    <button id="submitReport" class="report-submit-btn">Submit</button>
+    <div id="thankYouMsg" class="thanks-msg">Thank you, your report is submitted!</div>
+  </div>
+  <!-- ===================================== -->
+
   <div class="panel safe-toggle">
     <input type="checkbox" id="safeMode" />
     <label for="safeMode">Safe Mode</label>
@@ -160,63 +200,59 @@
       <button id="chooseStart" class="choose-btn">Choose</button>
       <div id="startSuggestions" class="suggestions"></div>
     </div>
-
     <div style="position:relative; margin-bottom:6px;">
       <input type="text" id="end" placeholder="End location or lat,lon" autocomplete="off" />
       <button id="chooseEnd" class="choose-btn">Choose</button>
       <div id="endSuggestions" class="suggestions"></div>
     </div>
-
     <button id="getRoute">Get Route</button>
   </div>
 
   <div class="panel info-panel" id="infoPanel"></div>
   <button id="recenterBtn" class="recenter-btn" title="Recenter / Follow">📍</button>
 
+  <!-- live location info box (unchanged) -->
+  <div id="liveInfoBox" class="live-info-box" role="region" aria-live="polite">
+    <div class="live-info-title">
+      <span>📍 Your location</span>
+      <button id="liveInfoClose" class="btn-close" title="Close">×</button>
+    </div>
+    <div id="liveInfoCoords" class="live-info-coords">Lat: --, Lon: --</div>
+    <div class="live-info-actions">
+      <button id="copyCoordsBtn" class="btn-copy" title="Copy coordinates">Copy</button>
+      <button id="setAsStartBtn" class="btn-setstart" title="Use as Start">Use as Start</button>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
   <script>
-    /* ✅ REPORT FEATURE */
-    const reportBtn = document.getElementById("reportBtn");
-    const reportBox = document.getElementById("reportBox");
-    const submitReport = document.getElementById("submitReport");
-    const thankYou = document.getElementById("thankYou");
-
-    reportBtn.addEventListener("click", () => {
-      reportBox.style.display = reportBox.style.display === "block" ? "none" : "block";
-    });
-
-    submitReport.addEventListener("click", () => {
-      thankYou.style.display = "block";
-      setTimeout(() => {
-        thankYou.style.display = "none";
-        reportBox.style.display = "none";
-        document.getElementById("crimeDetails").value = "";
-      }, 1800);
-    });
-
-    /* ✅ EVERYTHING BELOW IS YOUR ORIGINAL JAVASCRIPT */
-
     const map = L.map('map', { center: [28.6139, 77.2090], zoom: 12 });
     const streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
     const routeLayer = L.geoJSON(null, { style: { color: '#007bff', weight: 5 } }).addTo(map);
-
     let safeMode = false;
     document.getElementById('safeMode').addEventListener('change', e => safeMode = e.target.checked);
 
     let carMarker = null;
-    let chooseMode = null;
+    let chooseMode = null; // "start" | "end" | "report" | null
     let startMarker = null;
     let endMarker = null;
 
+    // ====== REPORT state (NEW) ======
+    let reportMarker = null;
+    let reportLocation = null;
+
+    // === Choose-on-map logic (extended to support "report") ===
     const chooseStartBtn = document.getElementById('chooseStart');
     const chooseEndBtn = document.getElementById('chooseEnd');
 
     function enableChoose(mode) {
       chooseMode = mode;
       map._container.style.cursor = "crosshair";
+      // toggle visual state for start/end; report has no toggle button styling here
       chooseStartBtn.classList.toggle("active", mode === "start");
       chooseEndBtn.classList.toggle("active", mode === "end");
+      console.log(`Choose mode: click map to select ${mode}`);
     }
 
     function disableChoose() {
@@ -224,6 +260,8 @@
       map._container.style.cursor = "";
       chooseStartBtn.classList.remove("active");
       chooseEndBtn.classList.remove("active");
+      const chooseReportLocBtn = document.getElementById('chooseReportLoc');
+      chooseReportLocBtn.classList.remove('active');
     }
 
     chooseStartBtn.addEventListener("click", () => enableChoose("start"));
@@ -232,18 +270,26 @@
     map.on("click", e => {
       if (!chooseMode) return;
       const { lat, lng } = e.latlng;
+
       if (chooseMode === "start") {
         document.getElementById("start").value = `${lat.toFixed(5)},${lng.toFixed(5)}`;
         if (startMarker) map.removeLayer(startMarker);
         startMarker = L.marker([lat, lng], { icon: L.divIcon({ html: "🟢", className: "", iconSize: [24, 24] }) }).addTo(map);
-      } else {
+      } else if (chooseMode === "end") {
         document.getElementById("end").value = `${lat.toFixed(5)},${lng.toFixed(5)}`;
         if (endMarker) map.removeLayer(endMarker);
         endMarker = L.marker([lat, lng], { icon: L.divIcon({ html: "🔴", className: "", iconSize: [24, 24] }) }).addTo(map);
+      } else if (chooseMode === "report") {
+        reportLocation = [lat, lng];
+        document.getElementById('reportCoords').value = `${lat.toFixed(5)},${lng.toFixed(5)}`;
+        if (reportMarker) map.removeLayer(reportMarker);
+        reportMarker = L.marker([lat, lng], { icon: L.divIcon({ html: "⚠️", className: "", iconSize: [24, 24] }) }).addTo(map);
       }
+
       disableChoose();
     });
 
+    // === Draw Red/Yellow Zones on Map ===
     async function loadZones() {
       try {
         const res = await fetch('/zones');
@@ -258,10 +304,14 @@
             fillOpacity: 0.6
           }).addTo(map);
         });
-      } catch (err) {}
+        console.log("Zones rendered:", data.length);
+      } catch (err) {
+        console.error("Failed to load zones:", err);
+      }
     }
     loadZones();
 
+    // === Geocoding suggestions ===
     async function fetchSuggestions(query, box, inputId) {
       if (query.length < 3) { box.style.display = 'none'; return; }
       try {
@@ -277,7 +327,7 @@
             if (inputId === 'start') {
               if (startMarker) map.removeLayer(startMarker);
               startMarker = L.marker([item.lat, item.lon], { icon: L.divIcon({ html: "🟢", className: "", iconSize: [24, 24] }) }).addTo(map);
-            } else {
+            } else if (inputId === 'end') {
               if (endMarker) map.removeLayer(endMarker);
               endMarker = L.marker([item.lat, item.lon], { icon: L.divIcon({ html: "🔴", className: "", iconSize: [24, 24] }) }).addTo(map);
             }
@@ -285,7 +335,10 @@
           box.appendChild(div);
         });
         box.style.display = data.length ? 'block' : 'none';
-      } catch (err) {}
+      } catch (err) {
+        console.warn("Suggest fetch failed:", err);
+        box.style.display = 'none';
+      }
     }
 
     document.getElementById('start').addEventListener('input', e =>
@@ -296,14 +349,20 @@
     );
 
     document.addEventListener('click', e => {
-      if (!e.target.closest('.routing-panel')) {
+      if (!e.target.closest('.routing-panel') && !e.target.closest('#reportBox') && e.target.id !== 'reportBtn') {
         document.getElementById('startSuggestions').style.display = 'none';
         document.getElementById('endSuggestions').style.display = 'none';
       }
     });
 
+    // === Live location ===
     let userMarker = null, userPulse = null, followMode = true;
     const recenterBtn = document.getElementById('recenterBtn');
+    const liveBox = document.getElementById('liveInfoBox');
+    const liveCoords = document.getElementById('liveInfoCoords');
+    const copyBtn = document.getElementById('copyCoordsBtn');
+    const setStartBtn = document.getElementById('setAsStartBtn');
+    const closeBtn = document.getElementById('liveInfoClose');
 
     function updateUserMarker(lat, lon) {
       if (!userMarker) {
@@ -313,17 +372,82 @@
         userMarker.setLatLng([lat, lon]);
         userPulse.setLatLng([lat, lon]);
       }
+      liveCoords.textContent = `Lat: ${lat.toFixed(5)}, Lon: ${lon.toFixed(5)}`;
+      liveBox.style.display = 'block';
       if (followMode) map.setView([lat, lon], 15);
     }
 
     recenterBtn.addEventListener('click', () => {
-      if (!("geolocation" in navigator)) return alert("Geolocation not supported.");
+      if (!("geolocation" in navigator)) { alert("Geolocation not supported."); return; }
       navigator.geolocation.getCurrentPosition(pos => {
         const { latitude, longitude } = pos.coords;
         updateUserMarker(latitude, longitude);
-      });
+      }, err => {
+        console.warn("getCurrentPosition failed:", err);
+        alert("Unable to get location. Please check permissions.");
+      }, { enableHighAccuracy: true, maximumAge: 0, timeout: 8000 });
     });
 
+    // copy coordinates to clipboard
+    copyBtn.addEventListener('click', async () => {
+      const txt = liveCoords.textContent.match(/Lat: ([\d\.\-]+), Lon: ([\d\.\-]+)/);
+      if (!txt) return;
+      const coordText = `${txt[1]},${txt[2]}`;
+      try {
+        await navigator.clipboard.writeText(coordText);
+        copyBtn.textContent = 'Copied ✓';
+        setTimeout(() => (copyBtn.textContent = 'Copy'), 1200);
+      } catch (err) {
+        const ta = document.createElement('textarea');
+        ta.value = coordText;
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); copyBtn.textContent = 'Copied ✓'; }
+        catch(_) { alert('Copy failed — please copy manually: ' + coordText); }
+        ta.remove();
+        setTimeout(() => (copyBtn.textContent = 'Copy'), 1200);
+      }
+    });
+
+    setStartBtn.addEventListener('click', () => {
+      const txt = liveCoords.textContent.match(/Lat: ([\d\.\-]+), Lon: ([\d\.\-]+)/);
+      if (!txt) return;
+      document.getElementById('start').value = `${txt[1]},${txt[2]}`;
+    });
+    closeBtn.addEventListener('click', () => liveBox.style.display = 'none');
+
+    // === Report open/submit ===
+    const reportBtn = document.getElementById('reportBtn');
+    const reportBox = document.getElementById('reportBox');
+    const chooseReportLocBtn = document.getElementById('chooseReportLoc');
+    const reportCoordsInput = document.getElementById('reportCoords');
+    const submitReportBtn = document.getElementById('submitReport');
+    const thankYouMsg = document.getElementById('thankYouMsg');
+
+    reportBtn.addEventListener('click', () => {
+      reportBox.style.display = reportBox.style.display === 'none' || reportBox.style.display === '' ? 'block' : 'none';
+    });
+
+    chooseReportLocBtn.addEventListener('click', () => {
+      enableChoose('report');
+      chooseReportLocBtn.classList.add('active');
+    });
+
+    submitReportBtn.addEventListener('click', () => {
+      // Basic client-only confirmation
+      thankYouMsg.textContent = 'Thank you, your report is submitted!';
+      thankYouMsg.style.display = 'block';
+      setTimeout(() => {
+        thankYouMsg.style.display = 'none';
+        reportBox.style.display = 'none';
+        // reset inputs but keep marker as a visual cue until next report
+        document.getElementById('crimeDetails').value = '';
+        reportLocation = null;
+        reportCoordsInput.value = '';
+      }, 1800);
+    });
+
+    // === Routing ===
     document.getElementById('getRoute').addEventListener('click', async () => {
       const start = document.getElementById('start').value.trim();
       const end = document.getElementById('end').value.trim();
@@ -331,10 +455,20 @@
       const mode = safeMode ? 'safe' : 'fast';
       const res = await fetch(`/route?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&mode=${mode}`);
       const data = await res.json();
-      if (data.error) return alert("Routing error");
+      if (data.error) return alert("Routing error: " + data.error);
       routeLayer.clearLayers();
       routeLayer.addData(data);
       map.fitBounds(routeLayer.getBounds(), { padding: [40, 40] });
+
+      // Add car emoji at start position (remove old if any)
+      const startCoord = data.geometry.coordinates[0];
+      if (carMarker) map.removeLayer(carMarker);
+      carMarker = L.marker([startCoord[1], startCoord[0]], { icon: L.divIcon({ html: "", className: "", iconSize: [100, 100] }) }).addTo(map);
+
+      const distanceKm = turf.length(data, { units: 'kilometers' }).toFixed(2);
+      const infoPanel = document.getElementById('infoPanel');
+      infoPanel.style.display = 'block';
+      infoPanel.innerHTML = `<strong>Mode:</strong> ${mode} <br><strong>Distance:</strong> ${distanceKm} km`;
     });
   </script>
 </body>
