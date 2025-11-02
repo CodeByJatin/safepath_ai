@@ -4,7 +4,7 @@ from sklearn.cluster import DBSCAN
 import json
 
 # ===== 1) Load data =====
-# Use your file name here (mine was /mnt/data/1544d6d2-...csv)
+# Use your file name here 
 df = pd.read_csv("crime_data_clean.csv")   # columns: Location, Latitude, Longitude, Crime Type, Time
 
 # We only need coordinates for clustering
@@ -59,3 +59,4 @@ zones = [
 with open("zones.json", "w") as f:
     json.dump(zones, f, indent=4)
 print("Saved zones.json (ready to plot on a map)")
+
